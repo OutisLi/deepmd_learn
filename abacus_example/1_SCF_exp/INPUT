@@ -1,0 +1,33 @@
+INPUT_PARAMETERS
+# Parameters (1.General)
+# 生成的包含大部分运行信息的 OUT.suffix 文件夹后缀
+suffix                  Si
+# 计算类型
+# scf, relax, cell-relax, md,...
+calculation             scf
+# 是否考虑对称性
+symmetry                1
+pseudo_dir              /home/outis/Software/abacus-develop/source/module_elecstate/test/support/
+orbital_dir             /home/outis/Software/abacus-develop/source/module_elecstate/test/support/
+basis_type              pw
+ecutwfc                 100
+
+# Parameters (2. SCF iterations)
+scf_nmax                100
+scf_thr                 1e-8
+
+# Parameters (3. Solve KS equation)
+# 计算的 Kohn-Sham 轨道数目
+# 0.5*max(1.2*occupied_bands, occupied_bands + 10) 计算 nbands
+nbands                  26
+# 在不同基组中展开哈密顿矩阵的对角化方法
+ks_solver               cg
+
+# Parameters (4.Smearing)
+smearing_method         gauss
+smearing_sigma          0.01
+
+# Parameters (5.Mixing)
+mixing_type             broyden
+mixing_beta             0.7
+mixing_gg0              0

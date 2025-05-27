@@ -1,0 +1,76 @@
+{
+  "api_version": "1.0",
+  "deepmd_version": "3.0.1",
+  "train": [
+    {
+      "command": "conda run -n dpmd_conda --no-capture-output dp",
+      "machine": {
+        "batch_type": "Shell",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "number_node": 1,
+        "cpu_per_node": 32,
+        "gpu_per_node": 1,
+        "group_size": 0,
+        "source_list": ["$HOME/.bashrc", "$HOME/.conda_init.sh"],
+        "envs": {
+          "DP_INTERFACE_PREC": "low",
+          "OMP_NUM_THREADS": 24,
+          "DP_INTRA_OP_PARALLELISM_THREADS": 24,
+          "DP_INTER_OP_PARALLELISM_THREADS": 1
+        },
+        "_comment": "that's all"
+      }
+    }
+  ],
+  "model_devi": [
+    {
+      "command": "conda run -n dpmd_conda --no-capture-output mpirun -np 1 ${LMP}",
+      "machine": {
+        "batch_type": "Shell",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "number_node": 1,
+        "cpu_per_node": 32,
+        "gpu_per_node": 1,
+        "group_size": 0,
+        "source_list": ["$HOME/.bashrc", "$HOME/.conda_init.sh"],
+        "envs": {
+          "LMP": "$HOME/Software/deepmd-kit/install/bin/lmp",
+          "OMP_NUM_THREADS": 32,
+          "DP_INTRA_OP_PARALLELISM_THREADS": 32,
+          "DP_INTER_OP_PARALLELISM_THREADS": 1
+        },
+        "_comment": "that's all"
+      }
+    }
+  ],
+  "fp": [
+    {
+      "command": "mpirun --use-hwthread-cpus -np 32 abacus",
+      "machine": {
+        "batch_type": "Shell",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "number_node": 1,
+        "cpu_per_node": 32,
+        "gpu_per_node": 1,
+        "group_size": 0,
+        "source_list": ["$HOME/.bashrc", "$HOME/.conda_init.sh", "$HOME/Software/abacus-develop/toolchain/abacus_env.sh"],
+        "envs": {
+          "OMP_NUM_THREADS": 1
+        },
+        "_comment": "that's all"
+      }
+    }
+  ]
+}

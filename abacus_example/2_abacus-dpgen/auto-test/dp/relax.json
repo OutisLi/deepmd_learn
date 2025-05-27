@@ -1,0 +1,13 @@
+{
+  "structures": ["conf"],
+  "interaction": {
+    "type": "deepmd",
+    "model": "frozen_model.pth",
+    "in_lammps": "lammps_input/in.lammps",
+    "type_map": { "Si": 0, "C": 1 }
+  },
+  "relaxation": {
+    "cal_type": "relaxation",
+    "cal_setting": { "etol": 0, "ftol": 1e-10, "maxiter": 5000, "maximal": 500000 }
+  }
+}

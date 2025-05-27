@@ -1,0 +1,65 @@
+{
+  "api_version": "1.0",
+  "deepmd_version": "3.0.1",
+  "train": [
+    {
+      "command": "conda run -n dpmd_conda --no-capture-output dp",
+      "machine": {
+        "batch_type": "Shell",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "number_node": 1,
+        "cpu_per_node": 32,
+        "gpu_per_node": 1,
+        "group_size": 0,
+        "envs": {
+          "DP_INTERFACE_PREC": "low",
+          "OMP_NUM_THREADS": 16,
+          "DP_INTRA_OP_PARALLELISM_THREADS": 16,
+          "DP_INTER_OP_PARALLELISM_THREADS": 2
+        },
+        "source_list": ["$HOME/.bashrc", "$HOME/.conda_init.sh"]
+      }
+    }
+  ],
+  "model_devi": [
+    {
+      "command": "conda run -n dpmd_conda --no-capture-output mpirun --use-hwthread-cpus -np 30 lmp",
+      "machine": {
+        "batch_type": "Shell",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "number_node": 1,
+        "cpu_per_node": 32,
+        "gpu_per_node": 1,
+        "group_size": 0,
+        "source_list": ["$HOME/.bashrc", "$HOME/.conda_init.sh"]
+      }
+    }
+  ],
+  "fp": [
+    {
+      "command": "mpirun --use-hwthread-cpus -np 24 abacus",
+      "machine": {
+        "batch_type": "Shell",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "number_node": 1,
+        "cpu_per_node": 32,
+        "gpu_per_node": 1,
+        "group_size": 0,
+        "source_list": ["$HOME/.bashrc", "$HOME/.conda_init.sh", "$HOME/Software/abacus-develop/toolchain/abacus_env.sh"],
+        "_comment": "that's all"
+      }
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "deepmd_version": "2.2.11",
+  "train": [
+    {
+      "machine": {
+        "batch_type": "Slurm",
+        "context_type": "local",
+        "local_root": "./",
+        "remote_root": "/lustre/home/2001110299/DPGEN-C/DPGEN-WORKING-DIR/train"
+      },
+      "resources": {
+        "account": "hpc0006168316",
+        "numb_node": 1,
+        "gpu_per_node": 1,
+        "cpu_per_node": 16,
+        "queue_name": "GPU80G",
+        "qos": "low",
+        "exclude_list": [],
+        "source_list": [],
+        "module_list": [],
+        "envs": { "DP_INFER_BATCH_SIZE": 8192 },
+        "time_limit": "120:0:0",
+        "group_size": 1
+      },
+      "command": "dp"
+    }
+  ],
+  "model_devi": [
+    {
+      "machine": {
+        "batch_type": "Slurm",
+        "context_type": "local",
+        "local_root": "./",
+        "remote_root": "/lustre/home/2001110299/DPGEN-C/DPGEN-WORKING-DIR/model_devi"
+      },
+      "resources": {
+        "account": "hpc0006168316",
+        "numb_node": 1,
+        "gpu_per_node": 1,
+        "cpu_per_node": 16,
+        "queue_name": "GPU80G",
+        "exclude_list": [],
+        "source_list": ["/lustre/home/2001110299/.bashrc"],
+        "module_list": ["mpi/2021.8.0"],
+        "time_limit": "120:0:0",
+        "qos": "low",
+        "group_size": 1
+      },
+      "command": "mpirun -np 1 /lustre/home/2001110299/.local/deepmdkit-3.0.0-gpu/bin/lmp"
+    }
+  ],
+  "fp": [
+    {
+      "command": "mpirun -np 64 abacus",
+      "machine": {
+        "batch_type": "Slurm",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "account": "hpc0006168316",
+        "number_node": 1,
+        "cpu_per_node": 64,
+        "gpu_per_node": 0,
+        "exclude_list": [],
+        "time_limit": "120:00:00",
+        "queue_name": "C064M0256G",
+        "group_size": 1,
+        "module_list": ["mpi/latest", "mkl/latest"],
+        "source_list": ["$HOME/.bashrc", "$HOME/conda_init.sh", "$HOME/Software/abacus-develop_intel/toolchain/abacus_env.sh"],
+        "custom_flags": ["#SBATCH --qos=high"],
+        "_comment": "that's all"
+      }
+    }
+  ]
+}

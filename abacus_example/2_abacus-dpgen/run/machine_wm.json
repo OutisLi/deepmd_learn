@@ -1,0 +1,94 @@
+{
+  "api_version": "1.0",
+  "deepmd_version": "3.0.1",
+  "train": [
+    {
+      "command": "conda run -n dpmd_conda --no-capture-output dp",
+      "machine": {
+        "batch_type": "Slurm",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "account": "hpc0006168316",
+        "numb_node": 1,
+        "cpu_per_node": 16,
+        "gpu_per_node": 1,
+        "queue_name": "GPU80G",
+        "time_limit": "120:0:0",
+        "group_size": 1,
+        "module_list": ["mpi/latest", "mkl/latest", "cuda/12.6.0"],
+        "source_list": ["$HOME/.bashrc", "$HOME/conda_init.sh"],
+        "exclude_list": [],
+        "custom_flags": ["#SBATCH --qos=high"],
+        "envs": {
+          "DP_INTERFACE_PREC": "low",
+          "OMP_NUM_THREADS": 16,
+          "DP_INTRA_OP_PARALLELISM_THREADS": 16,
+          "DP_INTER_OP_PARALLELISM_THREADS": 1
+        },
+        "_comment": "that's all"
+      }
+    }
+  ],
+  "model_devi": [
+    {
+      "command": "conda run -n dpmd_conda --no-capture-output mpirun -np 1 ${LMP}",
+      "machine": {
+        "batch_type": "Slurm",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "account": "hpc0006168316",
+        "numb_node": 1,
+        "cpu_per_node": 16,
+        "gpu_per_node": 1,
+        "queue_name": "GPU80G",
+        "time_limit": "120:0:0",
+        "group_size": 1,
+        "module_list": ["mpi/latest", "gcc/12.2.0", "cuda/12.6.0"],
+        "source_list": ["$HOME/.bashrc", "$HOME/conda_init.sh"],
+        "exclude_list": [],
+        "custom_flags": ["#SBATCH --qos=high"],
+        "envs": {
+          "LMP": "$HOME/Software/deepmd-kit/install/bin/lmp",
+          "OMP_NUM_THREADS": 16,
+          "DP_INTRA_OP_PARALLELISM_THREADS": 16,
+          "DP_INTER_OP_PARALLELISM_THREADS": 1
+        },
+        "_comment": "that's all"
+      }
+    }
+  ],
+  "fp": [
+    {
+      "command": "mpirun -np 64 abacus",
+      "machine": {
+        "batch_type": "Slurm",
+        "context_type": "LocalContext",
+        "local_root": "./",
+        "remote_root": "./"
+      },
+      "resources": {
+        "account": "hpc0006168316",
+        "number_node": 1,
+        "cpu_per_node": 64,
+        "gpu_per_node": 0,
+        "queue_name": "C064M0256G",
+        "time_limit": "120:00:00",
+        "group_size": 1,
+        "module_list": ["mpi/latest", "mkl/latest"],
+        "source_list": ["$HOME/.bashrc", "$HOME/conda_init.sh", "$HOME/Software/abacus-develop_intel/toolchain/abacus_env.sh"],
+        "exclude_list": [],
+        "custom_flags": ["#SBATCH --qos=high"],
+        "envs": {
+          "OMP_NUM_THREADS": 1
+        },
+        "_comment": "that's all"
+      }
+    }
+  ]
+}
