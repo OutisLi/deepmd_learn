@@ -1,0 +1,8 @@
+*
+!.gitignore
+!INPUT
+!KPT
+!STRU
+!*.upf
+!*.orb
+!*.cif
