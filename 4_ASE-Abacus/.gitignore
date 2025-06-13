@@ -6,3 +6,4 @@
 !*.upf
 !*.orb
 !*.cif
+!OUT.ABACUS/running_cell-relax.log

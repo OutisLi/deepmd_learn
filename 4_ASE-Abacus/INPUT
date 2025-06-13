@@ -1,11 +1,7 @@
 INPUT_PARAMETERS
 # Parameters (1.General)
-# 生成的包含大部分运行信息的 OUT.suffix 文件夹后缀
 suffix                  ABACUS
-# 计算类型
-# scf, relax, cell-relax, md,...
-calculation             relax
-# 是否考虑对称性
+calculation             cell-relax  # 修改为 cell-relax 来优化晶胞
 symmetry                1
 pseudo_dir              /home/outis/Research/deepmd_learn/4_ASE-Abacus
 orbital_dir             /home/outis/Research/deepmd_learn/4_ASE-Abacus
@@ -17,22 +13,23 @@ scf_nmax                100
 scf_thr                 1e-8
 
 # Parameters (3. Solve KS equation)
-# 计算的 Kohn-Sham 轨道数目
-# 0.5*max(1.2*occupied_bands, occupied_bands + 10) 计算 nbands
-# nbands                  26
-# 在不同基组中展开哈密顿矩阵的对角化方法
 ks_solver               genelpa
 nspin                   2
 
 # Parameters (4.Smearing)
 smearing_method         gaussian
-smearing_sigma          0.002
+smearing_sigma          0.001    # ref: 0.00735Ry
 
 # Parameters (5.Mixing)
 mixing_type             broyden
 mixing_beta             0.7
 mixing_gg0              0
 
+# Parameters (6.Relaxation)
+force_thr_ev            0.01     # 原子力收敛阈值
+stress_thr              0.5      # 内应力收敛阈值
+
+# Parameters (7.Calculation control)
 cal_stress              1
 cal_force               1
 out_stru                1
