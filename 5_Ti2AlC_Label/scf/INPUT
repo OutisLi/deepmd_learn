@@ -3,9 +3,9 @@ INPUT_PARAMETERS
 suffix                  ABACUS
 calculation             scf
 symmetry                1
-basis_type              lcao
+basis_type              pw
 ecutwfc                 100
-kspacing                0.24
+kspacing                0.22
 
 # Parameters (2. Files )
 pseudo_dir              ./
@@ -18,7 +18,7 @@ scf_nmax                100
 scf_thr                 1e-8
 
 # Parameters (4. Solve KS equation)
-ks_solver               genelpa
+ks_solver               cg
 nspin                   2
 
 # Parameters (5.Smearing)

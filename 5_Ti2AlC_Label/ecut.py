@@ -28,8 +28,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Define parameters for ecut test
-ecut_min = 90.0
-ecut_max = 130.0
+ecut_min = 50.0
+ecut_max = 250.0
 ecut_interval = 10.0
 num = int((float(ecut_max) - float(ecut_min)) // float(ecut_interval) + 1)
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,14 +43,18 @@ def function_submit():
         if confirm == "y":
             shutil.rmtree(os.path.join(current_dir, "ecuttest_dir"))
         else:
-            exit()
-    os.makedirs(os.path.join(current_dir, "ecuttest_dir"))
+            print("Using the existing 'ecuttest_dir'")
+    os.makedirs(os.path.join(current_dir, "ecuttest_dir"), exist_ok=True)
     os.chdir(os.path.join(current_dir, "ecuttest_dir"))
     for i in range(num):
         ecut = float(ecut_min) + float(ecut_interval) * i
         print(f"-> Processing ecut = {ecut} Ry ({i + 1}/{num})")
-        os.mkdir(os.path.join(current_dir, "ecuttest_dir", f"{ecut}"))
-        os.chdir(os.path.join(current_dir, "ecuttest_dir", f"{ecut}"))
+        ecut_dir = os.path.join(current_dir, "ecuttest_dir", f"{ecut}")
+        if os.path.exists(ecut_dir):
+            print(f"   Directory {ecut} already exists, skipping...")
+            continue
+        os.mkdir(ecut_dir)
+        os.chdir(ecut_dir)
         os.system(f"cp -r `find {current_dir}/scf -maxdepth 1 -type f` . ")
         with open(os.path.join(current_dir, "ecuttest_dir", f"{ecut}", "INPUT"), "r") as file:
             lines = file.readlines()
@@ -85,11 +89,9 @@ def function_postprocessing():
     for i in range(num):
         ecut = float(ecut_min) + float(ecut_interval) * i
         if not os.path.exists(os.path.join(f"{ecut}", f"OUT.{name}")):
-            print(f"The {ecut}/OUT.{name} file does not exist")
-            exit()
-        os.system(
-            f"grep E_KohnSham {os.path.join(f'{ecut}', f'OUT.{name}', 'running_scf.log')} -A0| tail -n1 | awk '{{print $3}}' >> energy"
-        )
+            print(f"The {ecut}/OUT.{name} file does not exist, skipping...")
+            continue
+        os.system(f"grep E_KohnSham {os.path.join(f'{ecut}', f'OUT.{name}', 'running_scf.log')} -A0| tail -n1 | awk '{{print $3}}' >> energy")
     t = 0
     with open("energy", "r") as infile, open("ecuttest_result.csv", "w") as outfile:
         for line in infile:
