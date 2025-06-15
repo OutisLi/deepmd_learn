@@ -84,11 +84,29 @@ class ABACUSConvergenceTest:
         Args:
             sr_path (str, optional): script to be sourced before running abacus. Defaults to None.
         """
-        env = os.environ.copy()
-        env["PATH"] = f"{os.environ['HOME']}/Software/abacus-develop/bin:" + env["PATH"] if sr_path is None else sr_path + ":" + env["PATH"]
+        # Set up the source command
+        source_cmd = "source $HOME/Software/abacus-develop/toolchain/abacus_env.sh"
+        if sr_path is not None:
+            source_cmd = f"source {sr_path}"
+
+        # Get environment variables after sourcing the script
+        env_cmd = f"bash -c '{source_cmd} && env'"
+        env_result = subprocess.run(env_cmd, shell=True, capture_output=True, text=True)
+
+        if env_result.returncode != 0:
+            print(f"Error sourcing environment: {env_result.stderr}")
+            return
+
+        # Parse environment variables
+        env = {}
+        for line in env_result.stdout.splitlines():
+            if "=" in line:
+                key, value = line.split("=", 1)
+                env[key] = value
 
         start_time = time.time()
 
+        # Run abacus with the sourced environment
         result = subprocess.run("abacus", shell=True, env=env, capture_output=True, text=True)
 
         if result.returncode != 0:
@@ -310,7 +328,9 @@ class ABACUSConvergenceTest:
 
         num = int((float(ecut_max) - float(ecut_min)) // float(ecut_interval) + 1)
 
-        with open(os.path.join(f"{ecut_min}", "INPUT"), "r") as file:
+        # Get the first ecut value to find the INPUT file
+        first_ecut = float(ecut_min)
+        with open(os.path.join(f"{first_ecut}", "INPUT"), "r") as file:
             lines = file.readlines()
         for i, line in enumerate(lines):
             if "suffix" in line:
@@ -347,11 +367,28 @@ class ABACUSConvergenceTest:
         plt.savefig("ecut_plot.png", format="png", dpi=300)
         print("Plot saved as ecut_plot.png")
 
-    def kpoint_xyz_run(self):
-        """Run directional k-point spacing convergence test calculations."""
-        print(
-            f"\nStarting kspacing test from {self.kspacing_min_xyz} to {self.kspacing_max_xyz} 1/Bohr with interval {self.kspacing_interval_xyz} 1/Bohr"
-        )
+    def kpoint_xyz_run(self, kspacing_min_xyz=None, kspacing_max_xyz=None, kspacing_interval_xyz=None):
+        """
+        Run directional k-point spacing convergence test calculations.
+
+        Args:
+            kspacing_min_xyz (list, optional): Minimum k-point spacing for each direction [x, y, z] (1/Bohr). Defaults to class attribute.
+            kspacing_max_xyz (list, optional): Maximum k-point spacing for each direction [x, y, z] (1/Bohr). Defaults to class attribute.
+            kspacing_interval_xyz (float, optional): Interval for directional k-point test (1/Bohr). Defaults to class attribute.
+        """
+        # Use provided parameters or fall back to class attributes
+        kspacing_min_xyz = kspacing_min_xyz if kspacing_min_xyz is not None else self.kspacing_min_xyz
+        kspacing_max_xyz = kspacing_max_xyz if kspacing_max_xyz is not None else self.kspacing_max_xyz
+        kspacing_interval_xyz = kspacing_interval_xyz if kspacing_interval_xyz is not None else self.kspacing_interval_xyz
+
+        # Store the parameters for later use in postprocessing
+        self._kpoint_xyz_params = {
+            "kspacing_min_xyz": kspacing_min_xyz,
+            "kspacing_max_xyz": kspacing_max_xyz,
+            "kspacing_interval_xyz": kspacing_interval_xyz,
+        }
+
+        print(f"\nStarting kspacing test from {kspacing_min_xyz} to {kspacing_max_xyz} 1/Bohr with interval {kspacing_interval_xyz} 1/Bohr")
         found = False
         test_dir = os.path.join(self.current_dir, "kpointtest_dir")
 
@@ -367,17 +404,17 @@ class ABACUSConvergenceTest:
         # Create tests for each direction
         for direction in range(3):  # x, y, z
             # Check if this direction needs testing
-            if self.kspacing_min_xyz[direction] == self.kspacing_max_xyz[direction]:
+            if kspacing_min_xyz[direction] == kspacing_max_xyz[direction]:
                 print(f"\nSkipping {['x', 'y', 'z'][direction]} direction (min equals max)")
                 continue
 
             # Calculate the number of points to test for this direction
-            num = int((self.kspacing_max_xyz[direction] - self.kspacing_min_xyz[direction]) // self.kspacing_interval_xyz + 1)
+            num = int((kspacing_max_xyz[direction] - kspacing_min_xyz[direction]) // kspacing_interval_xyz + 1)
             print(f"\nTesting kspacing in {['x', 'y', 'z'][direction]} direction ({num} points)")
 
             for i in range(num):
-                kspacing = self.kspacing_min_xyz.copy()
-                kspacing[direction] = round(self.kspacing_min_xyz[direction] + self.kspacing_interval_xyz * i, 3)
+                kspacing = kspacing_min_xyz.copy()
+                kspacing[direction] = round(kspacing_min_xyz[direction] + kspacing_interval_xyz * i, 3)
                 dir_name = f"kspacing_{kspacing[0]}_{kspacing[1]}_{kspacing[2]}"
 
                 # Check if the directory already exists
@@ -411,7 +448,17 @@ class ABACUSConvergenceTest:
         test_dir = os.path.join(self.current_dir, "kpointtest_dir")
         os.chdir(test_dir)
 
-        first_dir = f"kspacing_{self.kspacing_min_xyz[0]}_{self.kspacing_min_xyz[1]}_{self.kspacing_min_xyz[2]}"
+        # Use parameters from the previous run call or default values
+        if hasattr(self, "_kpoint_xyz_params"):
+            kspacing_min_xyz = self._kpoint_xyz_params["kspacing_min_xyz"]
+            kspacing_max_xyz = self._kpoint_xyz_params["kspacing_max_xyz"]
+            kspacing_interval_xyz = self._kpoint_xyz_params["kspacing_interval_xyz"]
+        else:
+            kspacing_min_xyz = self.kspacing_min_xyz
+            kspacing_max_xyz = self.kspacing_max_xyz
+            kspacing_interval_xyz = self.kspacing_interval_xyz
+
+        first_dir = f"kspacing_{kspacing_min_xyz[0]}_{kspacing_min_xyz[1]}_{kspacing_min_xyz[2]}"
         with open(os.path.join(first_dir, "INPUT"), "r") as file:
             lines = file.readlines()
         for i, line in enumerate(lines):
@@ -422,18 +469,18 @@ class ABACUSConvergenceTest:
         # Process results for each direction
         for direction in range(3):  # x, y, z
             # Check if this direction needs processing
-            if self.kspacing_min_xyz[direction] == self.kspacing_max_xyz[direction]:
+            if kspacing_min_xyz[direction] == kspacing_max_xyz[direction]:
                 print(f"\nSkipping results processing for {['x', 'y', 'z'][direction]} direction (min equals max)")
                 continue
 
             print(f"\nProcessing results for {['x', 'y', 'z'][direction]} direction")
             energy_file = f"energy_{['x', 'y', 'z'][direction]}"
-            num = int((self.kspacing_max_xyz[direction] - self.kspacing_min_xyz[direction]) // self.kspacing_interval_xyz + 1)
+            num = int((kspacing_max_xyz[direction] - kspacing_min_xyz[direction]) // kspacing_interval_xyz + 1)
 
             with open(energy_file, "w") as outfile:
                 for i in range(num):
-                    kspacing = self.kspacing_min_xyz.copy()
-                    kspacing[direction] = round(self.kspacing_min_xyz[direction] + self.kspacing_interval_xyz * i, 3)
+                    kspacing = kspacing_min_xyz.copy()
+                    kspacing[direction] = round(kspacing_min_xyz[direction] + kspacing_interval_xyz * i, 3)
                     dir_name = f"kspacing_{kspacing[0]}_{kspacing[1]}_{kspacing[2]}"
                     if not os.path.exists(os.path.join(dir_name, f"OUT.{name}")):
                         print(f"The {dir_name}/OUT.{name} file does not exist")
@@ -454,8 +501,16 @@ class ABACUSConvergenceTest:
         os.chdir(test_dir)
         print("\nGenerating plots...")
 
+        # Use parameters from the previous run call or default values
+        if hasattr(self, "_kpoint_xyz_params"):
+            kspacing_min_xyz = self._kpoint_xyz_params["kspacing_min_xyz"]
+            kspacing_max_xyz = self._kpoint_xyz_params["kspacing_max_xyz"]
+        else:
+            kspacing_min_xyz = self.kspacing_min_xyz
+            kspacing_max_xyz = self.kspacing_max_xyz
+
         # Calculate the number of directions to plot
-        directions_to_plot = [d for d in range(3) if self.kspacing_min_xyz[d] != self.kspacing_max_xyz[d]]
+        directions_to_plot = [d for d in range(3) if kspacing_min_xyz[d] != kspacing_max_xyz[d]]
         if not directions_to_plot:
             print("No directions to plot (all min values equal max values)")
             return

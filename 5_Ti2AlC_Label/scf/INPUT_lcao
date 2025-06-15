@@ -5,7 +5,7 @@ calculation             scf
 symmetry                1
 basis_type              lcao
 ecutwfc                 100
-kspacing                0.22
+kspacing                0.12
 
 # Parameters (2. Files )
 pseudo_dir              ./
@@ -23,7 +23,7 @@ nspin                   2
 
 # Parameters (5.Smearing)
 smearing_method         gaussian
-smearing_sigma          0.001    # ref: 0.00735Ry
+smearing_sigma          0.007    # ref: 0.00735Ry
 
 # Parameters (6.Mixing)
 mixing_type             broyden

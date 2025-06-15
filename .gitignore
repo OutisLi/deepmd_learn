@@ -3,7 +3,7 @@
 .AppleDouble
 .LSOverride
 .vscode/*
-__pycache__/*
+*/__pycache__/*
 desktop.ini
 .DS_Store
 ._*

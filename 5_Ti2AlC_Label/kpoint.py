@@ -32,13 +32,35 @@ kspacing_interval = 0.02
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-def run_abacus():
-    """Run ABACUS calculation with proper environment setup."""
-    env = os.environ.copy()
-    env["PATH"] = f"{os.environ['HOME']}/Software/abacus-develop/bin:" + env["PATH"]
+def run_abacus(sr_path: str = None):
+    """Run ABACUS calculation with proper environment setup.
+
+    Args:
+        sr_path (str, optional): script to be sourced before running abacus. Defaults to None.
+    """
+    # Set up the source command
+    source_cmd = "source $HOME/Software/abacus-develop/toolchain/abacus_env.sh"
+    if sr_path is not None:
+        source_cmd = f"source {sr_path}"
+
+    # Get environment variables after sourcing the script
+    env_cmd = f"bash -c '{source_cmd} && env'"
+    env_result = subprocess.run(env_cmd, shell=True, capture_output=True, text=True)
+
+    if env_result.returncode != 0:
+        print(f"Error sourcing environment: {env_result.stderr}")
+        return
+
+    # Parse environment variables
+    env = {}
+    for line in env_result.stdout.splitlines():
+        if "=" in line:
+            key, value = line.split("=", 1)
+            env[key] = value
 
     start_time = time.time()
 
+    # Run abacus with the sourced environment
     result = subprocess.run("abacus", shell=True, env=env, capture_output=True, text=True)
 
     if result.returncode != 0:

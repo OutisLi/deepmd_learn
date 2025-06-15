@@ -3,9 +3,9 @@ INPUT_PARAMETERS
 suffix                  ABACUS
 calculation             scf
 symmetry                1
-basis_type              pw
+basis_type              lcao
 ecutwfc                 100
-kspacing                0.22
+kspacing                0.12
 
 # Parameters (2. Files )
 pseudo_dir              ./
@@ -18,12 +18,12 @@ scf_nmax                100
 scf_thr                 1e-8
 
 # Parameters (4. Solve KS equation)
-ks_solver               cg
+ks_solver               genelpa
 nspin                   2
 
 # Parameters (5.Smearing)
 smearing_method         gaussian
-smearing_sigma          0.001    # ref: 0.00735Ry
+smearing_sigma          0.007    # ref: 0.00735Ry
 
 # Parameters (6.Mixing)
 mixing_type             broyden
