@@ -54,14 +54,16 @@ class ABACUSConvergenceTest:
         kspacing_interval_xyz (float): Interval for directional k-point test
     """
 
-    def __init__(self, work_dir: str = None):
+    def __init__(self, work_dir: str = None, sr_path: str = None):
         """Initialize the convergence test with default parameters.
 
         Args:
             work_dir (str, optional): Path to the working directory. Defaults to current directory.
+            sr_path (str, optional): Path to the script to be sourced before running abacus. Defaults to None.
         """
         # Common parameters
         self.current_dir = os.path.dirname(os.path.abspath(__file__)) if work_dir is None else work_dir
+        self.sr_path = sr_path
 
         # K-point spacing test parameters (uniform)
         self.kspacing_min = 0.1  # 1/Bohr
@@ -78,16 +80,12 @@ class ABACUSConvergenceTest:
         self.kspacing_max_xyz = [0.24, 0.24, 0.24]  # [x, y, z] in 1/Bohr
         self.kspacing_interval_xyz = 0.03
 
-    def run_abacus(self, sr_path: str = None):
-        """Run ABACUS calculation with proper environment setup.
-
-        Args:
-            sr_path (str, optional): script to be sourced before running abacus. Defaults to None.
-        """
+    def run_abacus(self):
+        """Run ABACUS calculation with proper environment setup."""
         # Set up the source command
         source_cmd = "source $HOME/Software/abacus-develop/toolchain/abacus_env.sh"
-        if sr_path is not None:
-            source_cmd = f"source {sr_path}"
+        if self.sr_path is not None:
+            source_cmd = f"source {self.sr_path}"
 
         # Get environment variables after sourcing the script
         env_cmd = f"bash -c '{source_cmd} && env'"
