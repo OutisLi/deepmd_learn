@@ -3,9 +3,9 @@ INPUT_PARAMETERS
 suffix                  ABACUS
 calculation             cell-relax  # 修改为 cell-relax 来优化晶胞
 symmetry                1
-basis_type              pw
+basis_type              lcao
 ecutwfc                 100
-kspacing                0.12
+kspacing                0.07 0.07 0.10
 
 # Parameters (2. Files )
 pseudo_dir              ./
@@ -18,7 +18,7 @@ scf_nmax                100
 scf_thr                 1e-8
 
 # Parameters (4. Solve KS equation)
-ks_solver               cg
+ks_solver               genelpa
 nspin                   2
 
 # Parameters (5.Smearing)
@@ -41,5 +41,5 @@ out_stru                1
 out_chg                 0
 
 # Parameters (9.Running control)
-device                  gpu
+# device                  gpu
 precision               double

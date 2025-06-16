@@ -41,5 +41,5 @@ out_stru                1
 out_chg                 0
 
 # Parameters (9.Running control)
-device                  gpu
+# device                  gpu
 precision               double
