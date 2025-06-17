@@ -10,6 +10,7 @@ kspacing                0.07 0.07 0.10
 # Parameters (2. Files )
 pseudo_dir              ./
 orbital_dir             ./
+dft_functional          PBE
 stru_file               ./STRU
 # kpoint_file             ./KPT
 
@@ -21,11 +22,11 @@ scf_thr                 1e-8
 ks_solver               cg
 nspin                   1
 
-# Parameters (5.Smearing)
+# Parameters (5. Smearing)
 smearing_method         gaussian
 smearing_sigma          0.007    # ref: 0.00735Ry
 
-# Parameters (6.Mixing)
+# Parameters (6. Mixing)
 mixing_type             broyden
 mixing_beta             0.7
 mixing_gg0              0
@@ -34,12 +35,12 @@ mixing_gg0              0
 force_thr_ev            0.01     # 原子力收敛阈值
 stress_thr              0.5      # 内应力收敛阈值
 
-# Parameters (8.Calculation control)
+# Parameters (8. Calculation control)
 cal_stress              1
 cal_force               1
 out_stru                1
 out_chg                 0
 
-# Parameters (9.Running control)
+# Parameters (9. Running control)
 # device                  gpu
 precision               double
