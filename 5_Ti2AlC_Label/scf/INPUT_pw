@@ -19,7 +19,7 @@ scf_thr                 1e-8
 
 # Parameters (4. Solve KS equation)
 ks_solver               cg
-nspin                   2
+nspin                   1
 
 # Parameters (5.Smearing)
 smearing_method         gaussian
