@@ -183,7 +183,7 @@ class ElasticCalculator:
 
             stress = self._get_stress(lines)
             lst_strain.append(strain)
-            lst_stress.append(Stress(stress * 0.1))
+            lst_stress.append(Stress(stress * -0.1))
 
             os.chdir(self.current_dir)
 
