@@ -35,12 +35,15 @@ mixing_gg0              0
 force_thr_ev            0.01     # 原子力收敛阈值
 stress_thr              0.5      # 内应力收敛阈值
 
-# Parameters (8. Calculation control)
+# Parameters (8. vdW Correction)
+# vdw_method              d3_bj
+
+# Parameters (9. Calculation control)
 cal_stress              1
 cal_force               1
 out_stru                1
 out_chg                 0
 
-# Parameters (9. Running control)
+# Parameters (10. Running control)
 # device                  gpu
 precision               double
