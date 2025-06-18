@@ -130,13 +130,13 @@ class ElasticCalculator:
 
         # Create shell script for running ABACUS calculations
         script_content = """#!/usr/bin/env zsh
-                            for i in task.*; do
-                                cd ./$i
-                                pwd
-                                abacus > abacus.out
-                                cd ../
-                            done
-                            """
+for i in task.*; do
+cd ./$i
+pwd
+abacus > abacus.out
+cd ../
+done
+"""
         script_path = os.path.join(work_dir, "elastic_run_relax.sh")
         with open(script_path, "w") as f:
             f.write(script_content)
