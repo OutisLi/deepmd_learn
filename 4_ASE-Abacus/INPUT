@@ -29,7 +29,6 @@ smearing_sigma          0.001    # ref: 0.00735Ry
 # Parameters (6. Mixing)
 mixing_type             broyden
 mixing_beta             0.7
-mixing_gg0              0
 
 # Parameters (7.Relaxation)
 force_thr_ev            0.01     # 原子力收敛阈值
