@@ -128,6 +128,28 @@ class ElasticCalculator:
             dumpfn(df.as_dict(), "strain.json", indent=4)
             os.chdir(self.current_dir)
 
+        # Create shell script for running ABACUS calculations
+        script_content = """#!/usr/bin/env zsh
+                            for i in task.*; do
+                                cd ./$i
+                                pwd
+                                abacus > abacus.out
+                                cd ../
+                            done
+                            """
+        script_path = os.path.join(work_dir, "elastic_run_relax.sh")
+        with open(script_path, "w") as f:
+            f.write(script_content)
+
+        # Make the script executable
+        os.chmod(script_path, 0o755)
+
+        # Add task* to .gitignore
+        gitignore_path = os.path.join(work_dir, ".gitignore")
+        gitignore_content = "task*\n"
+        with open(gitignore_path, "w") as f:
+            f.write(gitignore_content)
+
     def compute_elastic(self):
         """
         Compute elastic constants from the deformed structures.
