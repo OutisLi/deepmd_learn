@@ -20,7 +20,7 @@ class ElasticCalculator:
     and necessary input files for each deformation.
     """
 
-    def __init__(self, relax_dir="cell-relax"):
+    def __init__(self, relax_dir="cell-relax", dfm_dir="elastic-calc"):
         """
         Initialize the ElasticCalculator.
 
@@ -29,6 +29,7 @@ class ElasticCalculator:
         """
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         self.relax_dir = os.path.join(self.current_dir, relax_dir)
+        self.dfm_dir = os.path.join(self.current_dir, dfm_dir)
 
         self.equi_log = os.path.join(self.relax_dir, "OUT.ABACUS", "running_cell-relax.log")
         self.equi_contcar = os.path.join(self.relax_dir, "OUT.ABACUS", "STRU_ION_D")
@@ -44,6 +45,7 @@ class ElasticCalculator:
         Generate deformed structures for elastic property calculations.
 
         Args:
+            dfm_dir (str): Directory to save the deformed structures. Defaults to "elastic-calc".
             norm_strains (list): List of normal strain values. Defaults to [-0.010, -0.005, 0.005, 0.010].
             shear_strains (list): List of shear strain values. Defaults to [-0.010, -0.005, 0.005, 0.010].
 
@@ -66,7 +68,7 @@ class ElasticCalculator:
         print(f"gen with norm {norm_strains}")
         print(f"gen with shear {shear_strains}")
 
-        work_dir = os.path.join(self.current_dir, "elastic-calc")
+        work_dir = self.dfm_dir
         os.makedirs(work_dir, exist_ok=True)
         os.chdir(work_dir)
         os.system(f"cp -r `find {self.relax_dir} -maxdepth 1 -type f` . ")
@@ -126,30 +128,6 @@ class ElasticCalculator:
             dumpfn(df.as_dict(), "strain.json", indent=4)
             os.chdir(self.current_dir)
 
-    def _get_stress(self, lines: list) -> np.ndarray:
-        """
-        Extract stress tensor from ABACUS output.
-
-        Args:
-            lines (list): List of lines from ABACUS output file.
-
-        Returns:
-            np.ndarray: 3x3 stress tensor in kB.
-        """
-        stress = np.zeros([3, 3])
-        for idx, line in enumerate(lines):
-            if "TOTAL-STRESS (KBAR)" in line:
-                stress_xx = float(lines[idx + 2].split()[0])
-                stress_yy = float(lines[idx + 3].split()[1])
-                stress_zz = float(lines[idx + 4].split()[2])
-                stress_xy = float(lines[idx + 2].split()[1])
-                stress_yz = float(lines[idx + 3].split()[2])
-                stress_zx = float(lines[idx + 2].split()[2])
-                stress[0] = [stress_xx, stress_xy, stress_zx]
-                stress[1] = [stress_xy, stress_yy, stress_yz]
-                stress[2] = [stress_zx, stress_yz, stress_zz]
-        return stress
-
     def compute_elastic(self):
         """
         Compute elastic constants from the deformed structures.
@@ -165,7 +143,7 @@ class ElasticCalculator:
         equi_stress = Stress(self._get_stress(lines) * 0.1)
 
         # Process all task directories
-        work_dir = os.path.join(self.current_dir, "elastic-calc")
+        work_dir = self.dfm_dir
         task_dirs = glob.glob(os.path.join(work_dir, "task.*"))
         lst_strain = []
         lst_stress = []
@@ -222,3 +200,27 @@ class ElasticCalculator:
         # Save results
         output_file = os.path.join(work_dir, "elastic.json")
         dumpfn(res_data, output_file, indent=4)
+
+    def _get_stress(self, lines: list) -> np.ndarray:
+        """
+        Extract stress tensor from ABACUS output.
+
+        Args:
+            lines (list): List of lines from ABACUS output file.
+
+        Returns:
+            np.ndarray: 3x3 stress tensor in kB.
+        """
+        stress = np.zeros([3, 3])
+        for idx, line in enumerate(lines):
+            if "TOTAL-STRESS (KBAR)" in line:
+                stress_xx = float(lines[idx + 2].split()[0])
+                stress_yy = float(lines[idx + 3].split()[1])
+                stress_zz = float(lines[idx + 4].split()[2])
+                stress_xy = float(lines[idx + 2].split()[1])
+                stress_yz = float(lines[idx + 3].split()[2])
+                stress_zx = float(lines[idx + 2].split()[2])
+                stress[0] = [stress_xx, stress_xy, stress_zx]
+                stress[1] = [stress_xy, stress_yy, stress_yz]
+                stress[2] = [stress_zx, stress_yz, stress_zz]
+        return stress
