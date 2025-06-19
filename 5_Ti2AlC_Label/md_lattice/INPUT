@@ -38,8 +38,9 @@ md_pmode                aniso           # 控压方式: aniso (各向异性), �
 md_pfirst               0.0             # 目标压强 (单位: GPa)
 md_dt                   1.0             # 时间步长 (单位: fs)
 md_nstep                10000           # 模拟总步数。10000步即10 ps, 需要足够长以达到平衡和统计
-md_dumpfreq             10              # 每10步输出一次log和轨迹文件
-md_restart              1               # 开启断点续算功能
+md_dumpfreq             1               # 每1步输出一次log和轨迹文件
+md_restartfreq          5               # 每5步输出一次restart文件
+# md_restart              1               # 开启断点续算功能
 
 # Parameters (8. vdW Correction)
 vdw_method              d3_bj
@@ -49,8 +50,6 @@ cal_stress              1
 cal_force               1
 out_stru                1
 out_chg                 0
-out_md_log              1               # 每 md_dumpfreq 步输出能量、温度、压强等信息
-out_md_traj             1               # 每 md_dumpfreq 步输出原子坐标轨迹
 
 # Parameters (10. Running control)
 # device                  gpu
