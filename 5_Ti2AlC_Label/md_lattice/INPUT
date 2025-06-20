@@ -11,7 +11,7 @@ kspacing                0.15
 pseudo_dir              ./
 orbital_dir             ./
 dft_functional          PBE
-stru_file               ./STRU
+stru_file               ./STRU_2x2x3
 # kpoint_file             ./KPT
 
 # Parameters (3. SCF iterations)
