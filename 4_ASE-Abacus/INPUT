@@ -19,7 +19,7 @@ scf_nmax                100
 scf_thr                 1e-8
 
 # Parameters (4. Solve KS equation)
-ks_solver               genelpa
+# ks_solver               genelpa      # Default: cg for pw and genelpa for lcao(cpu) cusolver for lcao(gpu)
 nspin                   1
 
 # Parameters (5. Smearing)
