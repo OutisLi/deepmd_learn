@@ -5,7 +5,7 @@ calculation             cell-relax  # 修改为 cell-relax 来优化晶胞
 symmetry                1
 basis_type              pw
 ecutwfc                 100
-kspacing                0.07 0.07 0.10
+kspacing                0.15
 
 # Parameters (2. Files )
 pseudo_dir              ./

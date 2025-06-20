@@ -223,8 +223,12 @@ class ABACUSConvergenceTest:
                 os.remove("temp_energy")
         print("Results processed successfully!")
 
-    def kpoint_generate_plot(self):
-        """Generate plot for k-point spacing convergence test."""
+    def kpoint_generate_plot(self, n_atoms=8):
+        """Generate plot for k-point spacing convergence test.
+
+        Args:
+            n_atoms (int, optional): Number of atoms in the unit cell. Defaults to 8.
+        """
         test_dir = os.path.join(self.current_dir, "kpointtest_dir")
         os.chdir(test_dir)
         print("\nGenerating plots...")
@@ -236,11 +240,15 @@ class ABACUSConvergenceTest:
         df = pd.read_csv(energy_file, header=None)
 
         # Plot
-        ax.plot(df.iloc[:, 0], df.iloc[:, 1], marker="o")
+        ax.plot(df.iloc[:, 0], df.iloc[:, 1] / n_atoms, marker="o")
         ax.set_title("kspacing")
         ax.set_xlabel("kspacing")
-        ax.set_ylabel("Energy / eV")
+        ax.set_ylabel("Energy / eV / atom")
         ax.grid(True)
+
+        # add axhline at leftmost point
+        ax.axhline(y=df.iloc[0, 1] / n_atoms + 1e-3, color="red", linestyle="--")
+        ax.axhline(y=df.iloc[0, 1] / n_atoms - 1e-3, color="red", linestyle="--")
 
         plt.tight_layout()
         plt.savefig("kpoint_plot.png", format="png", dpi=300)
@@ -349,18 +357,27 @@ class ABACUSConvergenceTest:
         os.remove("./energy")
         print("Results processed successfully!")
 
-    def ecut_generate_plot(self):
-        """Generate plot for ecut convergence test."""
+    def ecut_generate_plot(self, n_atoms=8):
+        """Generate plot for ecut convergence test.
+
+        Args:
+            n_atoms (int, optional): Number of atoms in the unit cell. Defaults to 8.
+        """
         test_dir = os.path.join(self.current_dir, "ecuttest_dir")
         os.chdir(test_dir)
         print("\nGenerating plot...")
         df = pd.read_csv("ecuttest_result.csv", header=None)
         plt.figure(figsize=(10, 6))
-        plt.plot(df.iloc[:, 0], df.iloc[:, 1], marker="o")
+        plt.plot(df.iloc[:, 0], df.iloc[:, 1] / n_atoms, marker="o")
         plt.title("Energy_Cutoff_Test")
         plt.xlabel("ecutwfc / Ry")
-        plt.ylabel("Energy / eV")
+        plt.ylabel("Energy / eV / atom")
         plt.grid(True)
+
+        # add axhline at leftmost point
+        plt.axhline(y=df.iloc[0, 1] / n_atoms + 1e-3, color="red", linestyle="--")
+        plt.axhline(y=df.iloc[0, 1] / n_atoms - 1e-3, color="red", linestyle="--")
+
         plt.tight_layout()
         plt.savefig("ecut_plot.png", format="png", dpi=300)
         print("Plot saved as ecut_plot.png")
@@ -493,8 +510,12 @@ class ABACUSConvergenceTest:
                     os.remove("temp_energy")
         print("Results processed successfully!")
 
-    def kpoint_xyz_generate_plot(self):
-        """Generate plots for directional k-point spacing convergence test."""
+    def kpoint_xyz_generate_plot(self, n_atoms=8):
+        """Generate plots for directional k-point spacing convergence test.
+
+        Args:
+            n_atoms (int, optional): Number of atoms in the unit cell. Defaults to 8.
+        """
         test_dir = os.path.join(self.current_dir, "kpointtest_dir")
         os.chdir(test_dir)
         print("\nGenerating plots...")
@@ -523,11 +544,15 @@ class ABACUSConvergenceTest:
             df = pd.read_csv(energy_file, header=None)
 
             # Plot for each direction
-            axes[idx].plot(df.iloc[:, 0], df.iloc[:, 1], marker="o")
+            axes[idx].plot(df.iloc[:, 0], df.iloc[:, 1] / n_atoms, marker="o")
             axes[idx].set_title(f"kspacing_{['x', 'y', 'z'][direction]}")
             axes[idx].set_xlabel(f"kspacing_{['x', 'y', 'z'][direction]}")
-            axes[idx].set_ylabel("Energy / eV")
+            axes[idx].set_ylabel("Energy / eV / atom")
             axes[idx].grid(True)
+
+            # add axhline at leftmost point
+            axes[idx].axhline(y=df.iloc[0, 1] / n_atoms + 1e-3, color="red", linestyle="--")
+            axes[idx].axhline(y=df.iloc[0, 1] / n_atoms - 1e-3, color="red", linestyle="--")
 
         plt.tight_layout()
         plt.savefig("kpoint_plot.png", format="png", dpi=300)
@@ -546,7 +571,7 @@ class ABACUSConvergenceTest:
                 self.kpoint_run()
             elif operation == "post":
                 self.kpoint_postprocessing()
-                self.kpoint_generate_plot()
+                self.kpoint_generate_plot(n_atoms=8)
             else:
                 self._print_usage()
         elif test_type == "ecut":
@@ -554,7 +579,7 @@ class ABACUSConvergenceTest:
                 self.ecut_run()
             elif operation == "post":
                 self.ecut_postprocessing()
-                self.ecut_generate_plot()
+                self.ecut_generate_plot(n_atoms=8)
             else:
                 self._print_usage()
         elif test_type == "kpoint_xyz":
@@ -562,7 +587,7 @@ class ABACUSConvergenceTest:
                 self.kpoint_xyz_run()
             elif operation == "post":
                 self.kpoint_xyz_postprocessing()
-                self.kpoint_xyz_generate_plot()
+                self.kpoint_xyz_generate_plot(n_atoms=8)
             else:
                 self._print_usage()
         else:
@@ -578,15 +603,15 @@ class ABACUSConvergenceTest:
         if test_type == "kpoint":
             self.kpoint_run()
             self.kpoint_postprocessing()
-            self.kpoint_generate_plot()
+            self.kpoint_generate_plot(n_atoms=8)
         elif test_type == "ecut":
             self.ecut_run()
             self.ecut_postprocessing()
-            self.ecut_generate_plot()
+            self.ecut_generate_plot(n_atoms=8)
         elif test_type == "kpoint_xyz":
             self.kpoint_xyz_run()
             self.kpoint_xyz_postprocessing()
-            self.kpoint_xyz_generate_plot()
+            self.kpoint_xyz_generate_plot(n_atoms=8)
         else:
             self._print_usage()
 
