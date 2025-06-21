@@ -54,16 +54,18 @@ class ABACUSConvergenceTest:
         kspacing_interval_xyz (float): Interval for directional k-point test
     """
 
-    def __init__(self, work_dir: str = None, sr_path: str = None):
+    def __init__(self, work_dir: str = None, sr_path: str = None, abacus_prefix: str = ""):
         """Initialize the convergence test with default parameters.
 
         Args:
             work_dir (str, optional): Path to the working directory. Defaults to current directory.
             sr_path (str, optional): Path to the script to be sourced before running abacus. Defaults to None.
+            abacus_prefix (str, optional): Prefix to the abacus command. Defaults to "".
         """
         # Common parameters
         self.current_dir = os.path.dirname(os.path.abspath(__file__)) if work_dir is None else work_dir
         self.sr_path = sr_path
+        self.abacus_prefix = abacus_prefix
 
         # K-point spacing test parameters (uniform)
         self.kspacing_min = 0.1  # 1/Bohr
@@ -105,7 +107,7 @@ class ABACUSConvergenceTest:
         start_time = time.time()
 
         # Run abacus with the sourced environment
-        result = subprocess.run("abacus", shell=True, env=env, capture_output=True, text=True)
+        result = subprocess.run(f"{self.abacus_prefix} abacus", shell=True, env=env, capture_output=True, text=True)
 
         if result.returncode != 0:
             print(f"Error running abacus: {result.stderr}")
@@ -116,7 +118,7 @@ class ABACUSConvergenceTest:
             seconds = int(elapsed_time % 60)
             print(f"Abacus completed successfully, time used: {minutes} min {seconds} sec")
 
-    def kpoint_run(self, kspacing_min=None, kspacing_max=None, kspacing_interval=None):
+    def kpoint_run(self, kspacing_min=None, kspacing_max=None, kspacing_interval=None, target_dir:str="scf"):
         """
         Run k-point spacing convergence test calculations (uniform spacing).
 
@@ -124,6 +126,7 @@ class ABACUSConvergenceTest:
             kspacing_min (float, optional): Minimum k-point spacing (1/Bohr). Defaults to class attribute.
             kspacing_max (float, optional): Maximum k-point spacing (1/Bohr). Defaults to class attribute.
             kspacing_interval (float, optional): Interval for k-point spacing test (1/Bohr). Defaults to class attribute.
+            target_dir (str, optional): Target directory to copy input files from. Defaults to "scf".
         """
         # Use provided parameters or fall back to class attributes
         kspacing_min = kspacing_min if kspacing_min is not None else self.kspacing_min
@@ -162,9 +165,13 @@ class ABACUSConvergenceTest:
             print(f"-> Processing kspacing = {kspacing} 1/Bohr ({i + 1}/{num})")
             os.mkdir(os.path.join(test_dir, dir_name))
             os.chdir(os.path.join(test_dir, dir_name))
-            os.system(f"cp -r `find {self.current_dir}/scf -maxdepth 1 -type f` . ")
+            os.system(f"cp -r `find {self.current_dir}/{target_dir} -maxdepth 1 -type f` . ")
             with open("INPUT", "r") as file:
                 lines = file.readlines()
+            for t, line in enumerate(lines):
+                if "calculation" in line:
+                    lines[t] = f"calculation             scf\n"
+                    break
             for t, line in enumerate(lines):
                 if "kspacing" in line:
                     lines[t] = f"kspacing                {kspacing}\n"
@@ -234,7 +241,7 @@ class ABACUSConvergenceTest:
         print("\nGenerating plots...")
 
         # Create a figure
-        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+        fig, ax = plt.subplots(1, 1, figsize=(7, 5))
 
         energy_file = "energy"
         df = pd.read_csv(energy_file, header=None)
