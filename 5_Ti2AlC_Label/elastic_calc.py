@@ -80,9 +80,8 @@ class ElasticCalculator:
             output_task = os.path.join(work_dir, f"task.{ii:03d}")
             os.makedirs(output_task, exist_ok=True)
             os.chdir(output_task)
-
             # STRU
-            dfm_ss.deformed_structures[ii].to("POSCAR", fmt="POSCAR")
+            dfm_ss.deformed_structures[ii].to("POSCAR", fmt="poscar")
             stru = dpdata.System("POSCAR", fmt="vasp/poscar")
             n_atoms = len(stru["atom_names"])
             atom_mass = []

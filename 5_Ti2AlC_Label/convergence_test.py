@@ -54,7 +54,7 @@ class ABACUSConvergenceTest:
         kspacing_interval_xyz (float): Interval for directional k-point test
     """
 
-    def __init__(self, work_dir: str = None, sr_path: str = None, abacus_prefix: str = ""):
+    def __init__(self, work_dir: str | None = None, sr_path: str | None = None, abacus_prefix: str = ""):
         """Initialize the convergence test with default parameters.
 
         Args:
