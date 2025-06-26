@@ -49,7 +49,7 @@ md_dt                   1.0             # 时间步长 (单位: fs)
 md_nstep                10000           # 模拟总步数。10000步即10 ps, 需要足够长以达到平衡和统计
 md_dumpfreq             1               # 每1步输出一次log和轨迹文件
 md_restartfreq          10              # 每10步输出一次restart文件
-# md_restart              1               # 开启断点续算功能
+md_restart              1               # 开启断点续算功能
 cal_stress              1
 cal_force               1
 out_stru                1
