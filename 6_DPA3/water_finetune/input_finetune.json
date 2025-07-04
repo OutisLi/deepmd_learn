@@ -34,9 +34,7 @@
             "activation_function": "custom_silu:3.0",
             "precision": "float32",
             "use_tebd_bias": false,
-            "concat_output_tebd": false,
-            "seed": 0,
-            "_comment": " that's all"
+            "concat_output_tebd": false
         },
         "fitting_net": {
             "neuron": [
@@ -48,7 +46,7 @@
             "resnet_dt": true,
             "precision": "float32",
             "dim_case_embd": 31,
-            "seed": 0,
+            "seed": 1,
             "_comment": " that's all"
         },
         "_comment": " that's all"
